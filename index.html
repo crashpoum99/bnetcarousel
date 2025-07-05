@@ -1,49 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Refresh" content="1800"> 
-</head>
-<body style="background-color: black;">
+  <meta http-equiv="Refresh" content="1800">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <style>
-.carousel{
-     /* Full height */
-  height: 100%; 
-
-/* Center and scale the image nicely */
-background-position: center;
-background-repeat: no-repeat;
-background-size: cover;
-}body, html {
-  height: 100%;
-}
-
+    body, html {
+      height: 100%;
+      margin: 0;
+      background-color: black;
+    }
+    .carousel {
+      height: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    .mySlides {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
   </style>
-<div class="carousel">
-  <img class="mySlides" src="./images/1gbit.png" style="width:100%">
-  <img class="mySlides" src="./images/logobnet.png" style="width:100%">
-  <img class="mySlides" src="./images/TVupgrades.png" style="width:100%">
-  <img class="mySlides" src="./images/kidsparty.png" style="width:100%">
-  <img class="mySlides" src="./images/BNETGG_GR_TV.png" style="width:100%">
-  <img class="mySlides" src="./images/TVfuzetea.png" style="width:100%">
-  
-</div>
+</head>
+<body>
+  <div class="carousel">
+    <img class="mySlides" src="./images/1gbit.png">
+    <img class="mySlides" src="./images/logobnet.png">
+    <img class="mySlides" src="./images/TVupgrades.png">
+    <img class="mySlides" src="./images/kidsparty.png">
+    <img class="mySlides" src="./images/BNETGG_GR_TV.png">
+    <img class="mySlides" src="./images/TVfuzetea.png">
+  </div>
 
-<script>
-var myIndex = 0;
-carousel();
+  <script>
+    var myIndex = 0;
+    carousel();
 
-function carousel() {
-  var i;
-  var x = document.getElementsByClassName("mySlides");
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";  
-  }
-  myIndex++;
-  if (myIndex > x.length) {myIndex = 1}    
-  x[myIndex-1].style.display = "block";  
-  setTimeout(carousel, 10000); // Change image every 2 seconds
-}
-</script>
+    function carousel() {
+      var slides = document.getElementsByClassName("mySlides");
+      
+      // Hide all slides and remove animations
+      for (var i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        slides[i].classList.remove('animate__animated', 'animate__slideInRight', 'animate__slideOutLeft');
+      }
+      
+      // Increment index
+      myIndex++;
+      if (myIndex > slides.length) {
+        myIndex = 1;
+      }
+      
+      // Show current slide with slide-in animation
+      slides[myIndex-1].style.display = "block";
+      slides[myIndex-1].classList.add('animate__animated', 'animate__slideInRight');
+      
+      // Set timeout for next slide
+      setTimeout(carousel, 10000); // Change image every 10 seconds
+    }
+  </script>
 </body>
-
 </html>
