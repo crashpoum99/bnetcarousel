@@ -24,116 +24,44 @@
   </style>
 </head>
 <body>
-  <div class="carousel" id="carousel">
-    <!-- Images will be injected here automatically by JavaScript -->
-  </div>
+  <div class="carousel" id="carousel"></div>
 
-  <!-- Animate.css CDN (if you don't already have it) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-  <script>
-    // Configuration
-    const imagesFolder = './images/';          // Folder with your images
-    const supportedExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
-    const slideDuration = 10000;               // 10 seconds
+  <script type="module">
+    const response = await fetch("https://api.github.com/repos/YOURUSERNAME/YOURREPO/contents/images");
+    const files = await response.json();
+    const images = files
+      .filter(f => /\.(png|jpe?g|gif|webp)$/i.test(f.name))
+      .map(f => f.download_url)
+      .sort();
 
-    let myIndex = 0;
-    let slides = [];
+    const container = document.getElementById('carousel');
+    images.forEach(src => {
+      const img = document.createElement('img');
+      img.className = 'mySlides';
+      img.src = src;
+      img.style.display = 'none';
+      container.appendChild(img);
+    });
 
-    // Step 1: Dynamically discover all images
-    async function loadImages() {
-      // We create a list of probable filenames (common trick for static sites)
-      // This works because most static hosts allow us to try URLs and get 404 if missing
-      const response = await fetch('./images/'); // some hosts serve directory indexes
-      let fileList = [];
-
-      if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
-        // Some servers return a directory listing — try to parse it (rare but nice when it works)
-        const text = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        doc.querySelectorAll('a').forEach(link => {
-          const href = link.getAttribute('href');
-          if (supportedExtensions.some(ext => href.toLowerCase().endsWith(ext))) {
-            fileList.push(href);
-          }
-        });
+    let i = 0;
+    const slides = document.getElementsByClassName('mySlides');
+    function show() {
+      for (let s of slides) {
+        s.style.display = 'none';
+        s.classList.remove('animate__animated', 'animate__slideInRight');
       }
-
-      // If directory listing failed (most common case), fall back to a smarter guess + test method
-      if (fileList.length === 0) {
-        // Common naming patterns people use
-        const possibleNames = [];
-        for (let i = 1; i <= 200; i++) {                  // try 1.png … 200.png etc.
-          supportedExtensions.forEach(ext => {
-            possibleNames.push(`${i}${ext}`);
-            possibleNames.push(`${i}. ${ext}`);
-            possibleNames.push(`image${i}${ext}`);
-            possibleNames.push(`img${i}${ext}`);
-          });
-        }
-        // Test which ones actually exist
-        const promises = possibleNames.map(async (file) => {
-          const url = imagesFolder + file;
-          try {
-            const res = await fetch(url, { method: 'HEAD' });
-            if (res.ok) return url;
-          } catch (_) {}
-          return null;
-        });
-
-        const results = await Promise.all(promises);
-        fileList = results.filter(Boolean);
-      }
-
-      // Sort alphabetically (optional but nice)
-      fileList.sort();
-
-      // Step 2: Inject <img> elements into the carousel
-      const carousel = document.getElementById('carousel');
-      fileList.forEach(src => {
-        const img = document.createElement('img');
-        img.className = 'mySlides';
-        img.src = src;
-        img.style.display = 'none'; // hidden until its turn
-        carousel.appendChild(img);
-      });
-
-      slides = document.getElementsByClassName('mySlides');
-
-      if (slides.length === 0) {
-        carousel.innerHTML = '<p style="color:red; text-align:center;">No images found in ./images/</p>';
-        return;
-      }
-
-      // Start the carousel once images are loaded
-      carousel();
+      slides[i].style.display = 'block';
+      slides[i].classList.add('animate__animated', 'animate__slideInRight');
+      i = (i + 1) % slides.length;
+      setTimeout(show, 10000);
     }
-
-    // Your existing carousel logic (unchanged, just slightly cleaned)
-    function carousel() {
-      // Hide all + remove animation classes
-      for (let i = 0; i < slides.length; i++) {
-        slides[i].style.display = 'none';
-        slides[i].classList.remove('animate__animated', 'animate__slideInRight');
-      }
-
-      myIndex++;
-      if (myIndex > slides.length) myIndex = 1;
-
-      // Show current
-      slides[myIndex - 1].style.display = 'block';
-      slides[myIndex - 1].classList.add('animate__animated', 'animate__slideInRight');
-
-      setTimeout(carousel, slideDuration);
-    }
-
-    // Start everything when the page loads
-    window.onload = loadImages;
+    show();
   </script>
 </body>
-Alternative Super-Simple Method (if you use Vite, Astro, or any bundler)
 </html>
+
 
 
 
